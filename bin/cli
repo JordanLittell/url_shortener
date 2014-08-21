@@ -8,7 +8,7 @@ u = User.create!(:email=>email)
 puts "Your user id is #{u.id}"
 puts "what would you like to do?"
 puts "enter 0 to create shortened url"
-puts "enter 1 to enter url"
+puts "enter 1 to visit a shortened url"
 
 input = gets.chomp.to_i
 
@@ -21,7 +21,10 @@ if input == 0
 end
 
 if input == 1 
-	puts "type in the url you want to visit:"
+	puts "type in the short url:"
 	url = gets.chomp
-	Launchy::Browser.new.visit(url)
+	destination = ShortenedUrl.select("long_url").where("short_url = ?", url) #this returns a relation
+	uri = destination.select{ |entity| entity.long_url if entity.long_url} #this is going to return array of shortened url objects
+
+	Launchy.open(uri.first.long_url)
 end
